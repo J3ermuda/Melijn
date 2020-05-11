@@ -108,12 +108,11 @@ object ImageUtils {
     //ByteArray (imageData)
     //String (urls)
     //Boolean (if it is from an argument -> true) (attachment or noArgs(author)) -> false)
-    suspend fun getImagesBytesNMessage(context: CommandContext, reqFormat: String? = null): Triple<Map<String, ByteArray>, Pair<Int, Int>, Boolean>? {
+    suspend fun getImagesBytesNMessage(context: CommandContext, reqFormat: String? = null): Triple<List<ByteArray>, Pair<Int, Int>, Boolean>? {
         val args = context.args
         val attachments = context.message.attachments
 
-        //filename, imagedata
-        val imgs: MutableMap<String, ByteArray> = mutableMapOf()
+        val imgs: MutableList<ByteArray> = mutableListOf()
         var error = false
         var errorFile: String? = null
         var url = ""
@@ -147,7 +146,7 @@ object ImageUtils {
                             } else {
                                 maxWidth = max(maxWidth, anImage.width)
                                 maxHeight = max(maxHeight, anImage.height)
-                                imgs[ze.name] = img
+                                imgs.add(img)
                             }
                             ze = zis.nextEntry
                         }
@@ -163,7 +162,7 @@ object ImageUtils {
                             errorFile = url
                             break
                         }
-                        imgs[attachment.fileName] = img
+                        imgs.add(img)
                     }
                 } catch (e: Throwable) {
                     val msg = context.getTranslation("message.attachmentnotanimage")
@@ -177,7 +176,7 @@ object ImageUtils {
             val urls = args[0].replace("\n", " ").split("\\s+".toRegex())
 
             try {
-                for ((index, url1) in urls.withIndex()) {
+                for (url1 in urls) {
                     val isZip = url1.endsWith(".zip")
 
                     if (isZip) {
@@ -199,7 +198,7 @@ object ImageUtils {
                             } else {
                                 maxWidth = max(maxWidth, anImage.width)
                                 maxHeight = max(maxHeight, anImage.height)
-                                imgs[ze.name] = img
+                                imgs.add(img)
                             }
                             ze = zis.nextEntry
                         }
@@ -216,7 +215,7 @@ object ImageUtils {
                             errorFile = url1
                             break
                         }
-                        imgs["$index"] = img
+                        imgs.add(img)
                     }
                 }
             } catch (e: Throwable) {
